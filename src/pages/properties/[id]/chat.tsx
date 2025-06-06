@@ -10,6 +10,7 @@ import UserLayout from '@/components/userLayout/Layout';
 import MessageList, { Message } from '@/components/chat/MessageList';
 import ChatInput from '@/components/chat/ChatInput';
 import { ThemeContext } from '@/components/context/ThemeContext';
+import Head from 'next/head';
 
 interface RawMessage {
   id: string;
@@ -210,6 +211,14 @@ const PropertyChatPage: React.FC = () => {
 
   return (
     <UserLayout>
+      <Head>
+        <title> Rentify | Chat</title>
+        <meta
+          name="description"
+          content="Chat with landlords and tenants about properties, manage bookings, and discuss details in real-time."
+        />
+        <link rel="canonical" href="/properties\[id]\chat" />
+      </Head>
       <div
         className={`min-h-screen p-6 ${
             theme === 'dark' ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'

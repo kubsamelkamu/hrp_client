@@ -29,6 +29,7 @@ const baseNavItems: NavItem[] = [
 ];
 
 export default function Header() {
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSubmenuOpen, setMobileSubmenuOpen] = useState<Record<string, boolean>>({});
   const [selectedLang, setSelectedLang] = useState('EN');
@@ -40,12 +41,37 @@ export default function Header() {
   const languages = ['EN', 'AM', 'OR'];
 
   const navItems = useMemo<NavItem[]>(() => {
-    const items = [...baseNavItems];
+    const items: NavItem[] = baseNavItems.map((item) => {
+      if (item.subItems) {
+        return {
+          label: item.label,
+          subItems: item.subItems.map((sub) => ({ ...sub })),
+        };
+      } else {
+        return { ...item };
+      }
+    });
+
     let bookingsHref: string;
     if (!user) bookingsHref = `/properties`;
     else if (user.role === 'TENANT') bookingsHref = '/bookings';
     else bookingsHref = '/landlord/bookings';
+
     items.splice(2, 0, { label: 'Bookings', href: bookingsHref });
+
+    const propertiesItem = items.find((i) => i.label === 'Properties');
+    if (propertiesItem?.subItems) {
+      propertiesItem.subItems = propertiesItem.subItems.map((sub) => {
+        if (sub.label === 'List Property') {
+          return {
+            label: sub.label,
+            href: user?.role === 'LANDLORD' ? '/properties/list' : '/become-landlord',
+          };
+        }
+        return sub;
+      });
+    }
+
     return items;
   }, [user]);
 
@@ -56,10 +82,11 @@ export default function Header() {
     }));
   };
 
-  const avatarSrc = user?.profilePhoto ?? '/avatar.jpg';
+  const initial = user?.name?.charAt(0).toUpperCase() ?? '';
+  const avatarSrc = user?.profilePhoto ?? '';
 
   return (
-    <header
+    <header  
       className={`sticky top-0 z-50 border-b transition-colors duration-300 ${
         theme === 'light'
           ? 'bg-gray-50 border-gray-200 text-gray-800'
@@ -151,16 +178,22 @@ export default function Header() {
 
           {user ? (
             <div className="relative group">
-              <div className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-blue-500">
-                <Image
-                  src={avatarSrc}
-                  alt="User Avatar"
-                  width={32}
-                  height={32}
-                  className="object-cover"
-                  priority
-                />
-              </div>
+              {avatarSrc ? (
+                <div className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-blue-500">
+                  <Image
+                    src={avatarSrc}
+                    alt="User Avatar"
+                    width={32}
+                    height={32}
+                    className="object-cover"
+                    priority
+                  />
+                </div>
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold ring-2 ring-blue-500">
+                  {initial}
+                </div>
+              )}
 
               <div
                 className={`absolute right-0 mt-2 w-48 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ${
@@ -187,6 +220,7 @@ export default function Header() {
             </Link>
           )}
         </div>
+
         <div className="md:hidden flex items-center space-x-3">
           <button
             onClick={toggleTheme}
@@ -196,16 +230,24 @@ export default function Header() {
           </button>
 
           {user && (
-            <div className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-blue-500">
-              <Image
-                src={avatarSrc}
-                alt="User Avatar"
-                width={32}
-                height={32}
-                className="object-cover"
-                priority
-              />
-            </div>
+            <>
+              {avatarSrc ? (
+                <div className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-blue-500">
+                  <Image
+                    src={avatarSrc}
+                    alt="User Avatar"
+                    width={32}
+                    height={32}
+                    className="object-cover"
+                    priority
+                  />
+                </div>
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold ring-2 ring-blue-500">
+                  {initial}
+                </div>
+              )}
+            </>
           )}
 
           <button onClick={() => setMobileMenuOpen((o) => !o)} className="p-2 rounded-lg">
@@ -213,6 +255,8 @@ export default function Header() {
           </button>
         </div>
       </div>
+
+      {/* Mobile submenu */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
@@ -243,7 +287,7 @@ export default function Header() {
                             exit={{ height: 0, opacity: 0 }}
                             className="pl-6 mt-1 space-y-1"
                           >
-                            {item.subItems.map((sub) => (
+                            {item.subItems!.map((sub) => (
                               <Link
                                 key={sub.label}
                                 href={sub.href}

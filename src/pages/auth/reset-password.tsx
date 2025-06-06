@@ -44,7 +44,7 @@ export default function ForgotPasswordPage() {
   return (
     <>
       <Head>
-        <title>Forgot Password | Rentify</title>
+        <title> Rentify | Forgot Password</title>
         <meta name="description" content="Reset your Rentify account password." />
       </Head>
       <div className="min-h-screen flex flex-col lg:flex-row">

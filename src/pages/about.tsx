@@ -4,6 +4,7 @@ import { useContext } from 'react';
 import { ThemeContext } from '@/components/context/ThemeContext';
 import { motion } from 'framer-motion';
 import UserLayout from '@/components/userLayout/Layout';
+import Head from 'next/head';
 
 type Theme = 'light' | 'dark';
 
@@ -19,13 +20,14 @@ export default function AboutPage() {
 
   return (
     <UserLayout>
-      <title> Rentify | About</title>
-      <meta
-        name="description"
-        content="Learn more about Rentify, Ethiopia&apos;s premier digital rental marketplace."
-      />
-      <link rel="canonical" href="/about" />
-
+      <Head>
+        <title> Rentify | About</title>
+        <meta
+          name="description"
+          content="Learn more about Rentify, Ethiopia&apos;s premier digital rental marketplace."
+        />
+        <link rel="canonical" href="/about" />
+      </Head>
       <div
         className={`min-h-screen transition-colors duration-300 ${
           theme === 'light' ? 'bg-gray-50' : 'bg-gray-900'

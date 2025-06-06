@@ -8,6 +8,7 @@ import socket from '@/utils/socket';
 import {fetchPropertyBookings,confirmBooking,rejectBooking,Booking,} from '@/store/slices/bookingSlice';
 import { fetchPropertyById } from '@/store/slices/propertySlice';
 import { ThemeContext } from '@/components/context/ThemeContext';
+import Head from 'next/head';
 
 const PAGE_SIZE = 5;
 
@@ -139,6 +140,14 @@ const PropertyBookingsPage: NextPage = () => {
 
   return (
     <UserLayout>
+      <Head>
+        <title> Rentify | Booking</title>
+        <meta
+          name="description"
+          content="Manage bookings for your property on Rentify. View, confirm, or reject booking requests from tenants."
+        />
+        <link rel="canonical" href="/booking" />
+      </Head>
       <div
         className={`min-h-screen p-6 transition-colors ${
           theme === 'dark' ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'

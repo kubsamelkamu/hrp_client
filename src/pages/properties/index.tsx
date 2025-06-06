@@ -1,4 +1,5 @@
 import { NextPage } from 'next';
+import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState, useContext } from 'react';
@@ -36,6 +37,13 @@ const PropertiesListPage: NextPage = () => {
 
   return (
     <UserLayout>
+      <Head>
+        <title>Rentify | Properties</title>
+        <meta
+          name="description"
+          content="Browse our latest property listings—filter by city, type, and price to find your dream home on Rentify."
+        />
+      </Head>
       <div
         className={`
           min-h-screen py-0 px-6
@@ -43,8 +51,6 @@ const PropertiesListPage: NextPage = () => {
         `}
       >
         <HeroSection />
-
-        {/* 2. Filters & property grid below, with top padding */}
         <div className="pt-12 max-w-7xl mx-auto">
           <FilterPanel
             initial={filters}
@@ -60,7 +66,7 @@ const PropertiesListPage: NextPage = () => {
             }}
           />
 
-          {loading ? (   
+          {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {[...Array(limit)].map((_, i) => (
                 <div
@@ -146,6 +152,7 @@ const PropertiesListPage: NextPage = () => {
                       </div>
                     )}
                   </div>
+
                   <div className="p-6">
                     <h2
                       className={`

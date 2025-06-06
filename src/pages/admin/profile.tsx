@@ -1,28 +1,27 @@
-import {ChangeEvent,FormEvent,useEffect,useState,useContext,} from "react";
+import {ChangeEvent,FormEvent,useEffect,useState,} from "react";
 import { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import {fetchCurrentProfile,saveProfile,clearError,} from "@/store/slices/authSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { ThemeContext } from "@/components/context/ThemeContext";
-import UserLayout from "@/components/userLayout/Layout";
 import toast from "react-hot-toast";
+import AdminLayout from "@/components/admin/AdminLayout";
 
 const ProfilePage: NextPage = () => {
 
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { theme } = useContext(ThemeContext)!;
   const { user, status: fetchStatus, error: fetchError } = useAppSelector(
     (s) => s.auth
-  );
+  )!;
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+
   const [nameError, setNameError] = useState("");
 
   useEffect(() => {
@@ -97,74 +96,55 @@ const ProfilePage: NextPage = () => {
 
   if (fetchStatus === "loading") {
     return (
-      <UserLayout>
-        <div
-          className={`min-h-screen flex items-center justify-center ${
-            theme === "dark"
-              ? "bg-gray-900 text-gray-100"
-              : "bg-gray-50 text-gray-900"
-          }`}
-        >
-          <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+      <AdminLayout>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-900">
+          <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full" />
         </div>
-      </UserLayout>
+      </AdminLayout>
     );
   }
 
   if (fetchError) {
     return (
-      <UserLayout>
-        <div
-          className={`min-h-screen flex items-center justify-center ${
-            theme === "dark"
-              ? "bg-gray-900 text-gray-100"
-              : "bg-gray-50 text-gray-900"
-          }`}
-        >
+      <AdminLayout>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-900">
           <p className="text-red-500">Error loading profile: {fetchError}</p>
         </div>
-      </UserLayout>
+      </AdminLayout>
     );
   }
 
   if (!user) return null;
 
   return (
-    <UserLayout>
+    <AdminLayout>
       <Head>
         <title>Rentify | Profile</title>
         <meta
           name="description"
-          content="View and edit your profile details on Rentify, including your name, email, and profile photo."
+          content="Manage your profile settings including name, email, and profile photo."
         />
-        <link rel="canonical" href="/profile" />
+        <link rel="canonical" href="/admin/profile" />
       </Head>
-      <div
-        className={`max-w-3xl mx-auto my-12 p-6 rounded-2xl shadow ${
-          theme === "dark" ? "bg-gray-800 text-gray-100" : "bg-white text-gray-900"
-        }`}
-      >
-        <h1 className="text-2xl font-bold mb-6">Your Profile</h1>
-
+      <div className="max-w-3xl mx-auto my-12 p-6 rounded-2xl shadow bg-white text-gray-900">
+        <h1 className="text-2xl font-bold text-blue-600 mb-6">Your Profile</h1>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium mb-1">Profile Photo</label>
             <div className="flex items-center space-x-6">
               {previewUrl ? (
-                <div className="relative h-24 w-24 rounded-full overflow-hidden bg-gray-200">
+                <div className="h-24 w-24 rounded-full overflow-hidden bg-gray-200">
                   <Image
-                    src={previewUrl}
+                    src={previewUrl!}
                     alt="Profile Preview"
-                    fill
-                    className="object-cover"
+                    width={96}
+                    height={96}
+                    className="object-cover rounded-full"
+                    loader={({ src }) => src}
                   />
                 </div>
               ) : (
-                <div
-                  className={`h-24 w-24 rounded-full flex items-center justify-center text-gray-500 ${
-                    theme === "dark" ? "bg-gray-700" : "bg-gray-300"
-                  }`}
-                >
+                <div className="h-24 w-24 rounded-full flex items-center justify-center bg-gray-300 text-gray-500">
                   No Photo
                 </div>
               )}
@@ -175,19 +155,16 @@ const ProfilePage: NextPage = () => {
                   type="file"
                   accept="image/*"
                   onChange={handleFileChange}
-                  className="block text-sm text-gray-700 file:mr-4 file:py-2 file:px-4
+                  className="block text-sm file:mr-4 file:py-2 file:px-4
                              file:rounded-full file:border-0
                              file:text-sm file:font-semibold
                              file:bg-blue-600 file:text-white
                              hover:file:bg-blue-700"
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  JPG, PNG, or GIF — Max 2MB
-                </p>
+                <p className="text-xs text-gray-500 mt-1">JPG, PNG, or GIF — Max 2MB</p>
               </div>
             </div>
           </div>
-
           <div className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-6">
             <div>
               <label className="block text-sm font-medium mb-1">Name</label>
@@ -198,11 +175,7 @@ const ProfilePage: NextPage = () => {
                 required
                 value={name}
                 onChange={handleNameChange}
-                className={`w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 ${
-                  theme === "dark"
-                    ? "bg-gray-700 border-gray-600 focus:ring-blue-400 text-gray-100"
-                    : "bg-gray-50 border-gray-300 focus:ring-blue-500 text-gray-900"
-                }`}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {nameError && (
                 <p className="mt-1 text-sm text-red-500">{nameError}</p>
@@ -216,11 +189,7 @@ const ProfilePage: NextPage = () => {
                 type="email"
                 readOnly
                 value={email}
-                className={`w-full px-4 py-2 rounded-lg border cursor-not-allowed ${
-                  theme === "dark"
-                    ? "bg-gray-700 border-gray-600 text-gray-100"
-                    : "bg-gray-50 border-gray-300 text-gray-900"
-                }`}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-gray-100 cursor-not-allowed"
               />
             </div>
           </div>
@@ -230,14 +199,9 @@ const ProfilePage: NextPage = () => {
               type="text"
               readOnly
               value={user.role}
-              className={`w-full px-4 py-2 rounded-lg border cursor-not-allowed ${
-                theme === "dark"
-                  ? "bg-gray-700 border-gray-600 text-gray-100"
-                  : "bg-gray-50 border-gray-300 text-gray-900"
-              }`}
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-gray-100 cursor-not-allowed"
             />
           </div>
-
           <div className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-6">
             <div>
               <label className="block text-sm font-medium mb-1">Joined On</label>
@@ -245,26 +209,16 @@ const ProfilePage: NextPage = () => {
                 type="text"
                 readOnly
                 value={new Date(user.createdAt).toLocaleDateString()}
-                className={`w-full px-4 py-2 rounded-lg border cursor-not-allowed ${
-                  theme === "dark"
-                    ? "bg-gray-700 border-gray-600 text-gray-100"
-                    : "bg-gray-50 border-gray-300 text-gray-900"
-                }`}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-gray-100 cursor-not-allowed"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">
-                Last Updated
-              </label>
+              <label className="block text-sm font-medium mb-1">Last Updated</label>
               <input
                 type="text"
                 readOnly
                 value={new Date(user.updatedAt).toLocaleDateString()}
-                className={`w-full px-4 py-2 rounded-lg border cursor-not-allowed ${
-                  theme === "dark"
-                    ? "bg-gray-700 border-gray-600 text-gray-100"
-                    : "bg-gray-50 border-gray-300 text-gray-900"
-                }`}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-gray-100 cursor-not-allowed"
               />
             </div>
           </div>
@@ -272,12 +226,10 @@ const ProfilePage: NextPage = () => {
             <button
               type="submit"
               disabled={saving || !!nameError}
-              className={`w-full py-3 rounded-lg text-lg font-medium shadow ${
+              className={`w-full py-3 rounded-lg text-lg font-medium shadow text-white ${
                 saving || nameError
-                  ? "opacity-50 cursor-not-allowed"
-                  : theme === "dark"
-                  ? "bg-blue-700 text-white hover:bg-blue-600"
-                  : "bg-blue-600 text-white hover:bg-blue-700"
+                  ? "opacity-50 cursor-not-allowed bg-blue-600"
+                  : "bg-blue-600 hover:bg-blue-700"
               }`}
             >
               {saving ? "Saving…" : "Save Changes"}
@@ -285,7 +237,7 @@ const ProfilePage: NextPage = () => {
           </div>
         </form>
       </div>
-    </UserLayout>
+    </AdminLayout>
   );
 };
 

@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import api from '@/utils/api';
 import axios from 'axios';
+import { changeUserRole } from './adminSlice';
 
 export const registerUser = createAsyncThunk<
   void,
@@ -19,7 +20,18 @@ export const registerUser = createAsyncThunk<
 );
 
 export const loginUser = createAsyncThunk<
-  { user: { id: string; name: string; email: string; role: string }; token: string },
+  {
+    user: {
+      id: string;
+      name: string;
+      email: string;
+      role: 'TENANT' | 'LANDLORD' | 'ADMIN';
+      profilePhoto?: string;
+      createdAt: string;
+      updatedAt: string;
+    };
+    token: string;
+  },
   { email: string; password: string },
   { rejectValue: string }
 >(
@@ -40,7 +52,7 @@ export const fetchCurrentProfile = createAsyncThunk<
     id: string;
     name: string;
     email: string;
-    role: string;
+    role: 'TENANT' | 'LANDLORD' | 'ADMIN';
     profilePhoto: string | null;
     createdAt: string;
     updatedAt: string;
@@ -70,7 +82,7 @@ export const saveProfile = createAsyncThunk<
     id: string;
     name: string;
     email: string;
-    role: string;
+    role: 'TENANT' | 'LANDLORD' | 'ADMIN';
     profilePhoto: string | null;
     createdAt: string;
     updatedAt: string;
@@ -98,15 +110,17 @@ export const saveProfile = createAsyncThunk<
 );
 
 interface AuthState {
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-    profilePhoto: string | null;
-    createdAt: string;
-    updatedAt: string;
-  } | null;
+  user:
+    | {
+        id: string;
+        name: string;
+        email: string;
+        role: 'TENANT' | 'LANDLORD' | 'ADMIN';
+        profilePhoto?: string | null;
+        createdAt: string;
+        updatedAt: string;
+      }
+    | null;
   token: string | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
@@ -140,94 +154,104 @@ const authSlice = createSlice({
     setAuth: (
       state,
       action: PayloadAction<{
-        token: string;
         user: {
           id: string;
           name: string;
           email: string;
-          role: string;
-          profilePhoto: string | null;
+          role: 'TENANT' | 'LANDLORD' | 'ADMIN';
+          profilePhoto?: string | null;
           createdAt: string;
           updatedAt: string;
         };
+        token: string;
       }>
     ) => {
-      state.token = action.payload.token;
       state.user = action.payload.user;
+      state.token = action.payload.token;
       state.status = 'succeeded';
       state.error = null;
+      localStorage.setItem('token', action.payload.token);
+      localStorage.setItem('user', JSON.stringify(action.payload.user));
     },
   },
   extraReducers: (builder) => {
-    builder
-      .addCase(registerUser.pending, (state) => {
-        state.status = 'loading';
-        state.error = null;
-      })
-      .addCase(registerUser.fulfilled, (state) => {
-        state.status = 'succeeded';
-        state.error = null;
-      })
-      .addCase(registerUser.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload || action.error.message || 'Failed to register';
-      });
-    builder
-      .addCase(loginUser.pending, (state) => {
-        state.status = 'loading';
-        state.error = null;
-        state.loading = true;
-      })
-      .addCase(loginUser.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.loading = false;
-        state.user = {
-          id: action.payload.user.id,
-          name: action.payload.user.name,
-          email: action.payload.user.email,
-          role: action.payload.user.role,
-          profilePhoto: null,
-          createdAt: '',  
-          updatedAt: '',
-        };
-        state.token = action.payload.token;
-        state.error = null;
-        localStorage.setItem('token', action.payload.token);
-        localStorage.setItem('user', JSON.stringify(state.user));
-      })
-      .addCase(loginUser.rejected, (state, action) => {
-        state.status = 'failed';
-        state.loading = false;
-        state.error = action.payload || action.error.message || 'Failed to login';
-      });
-    builder
-      .addCase(fetchCurrentProfile.pending, (state) => {
-        state.status = 'loading';
-        state.error = null;
-      })
-      .addCase(fetchCurrentProfile.fulfilled, (state, { payload }) => {
+    builder.addCase(registerUser.pending, (state) => {
+      state.status = 'loading';
+      state.error = null;
+    });
+    builder.addCase(registerUser.fulfilled, (state) => {
+      state.status = 'succeeded';
+      state.error = null;
+    });
+    builder.addCase(registerUser.rejected, (state, action) => {
+      state.status = 'failed';
+      state.error =
+        action.payload || action.error.message || 'Failed to register';
+    });
+
+    builder.addCase(loginUser.pending, (state) => {
+      state.status = 'loading';
+      state.error = null;
+      state.loading = true;
+    });
+    builder.addCase(loginUser.fulfilled, (state, action) => {
+      state.status = 'succeeded';
+      state.loading = false;
+      state.user = action.payload.user;
+      state.token = action.payload.token;
+      state.error = null;
+      localStorage.setItem('token', action.payload.token);
+      localStorage.setItem('user', JSON.stringify(action.payload.user));
+    });
+    builder.addCase(loginUser.rejected, (state, action) => {
+      state.status = 'failed';
+      state.loading = false;
+      state.error =
+        action.payload || action.error.message || 'Failed to login';
+    });
+
+    builder.addCase(fetchCurrentProfile.pending, (state) => {
+      state.status = 'loading';
+      state.error = null;
+    });
+    builder.addCase(
+      fetchCurrentProfile.fulfilled,
+      (state, { payload }) => {
         state.status = 'succeeded';
         state.user = payload;
         localStorage.setItem('user', JSON.stringify(payload));
-      })
-      .addCase(fetchCurrentProfile.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload || action.error.message || 'Failed to load profile';
-      });
-    builder
-      .addCase(saveProfile.pending, (state) => {
-        state.status = 'loading';
-        state.error = null;
-      })
-      .addCase(saveProfile.fulfilled, (state, { payload }) => {
-        state.status = 'succeeded';
-        state.user = payload;
-        localStorage.setItem('user', JSON.stringify(payload));
-      })
-      .addCase(saveProfile.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload || action.error.message || 'Failed to save profile';
-      });
+      }
+    );
+    builder.addCase(fetchCurrentProfile.rejected, (state, action) => {
+      state.status = 'failed';
+      state.error =
+        action.payload || action.error.message || 'Failed to load profile';
+    });
+
+    builder.addCase(saveProfile.pending, (state) => {
+      state.status = 'loading';
+      state.error = null;
+    });
+    builder.addCase(saveProfile.fulfilled, (state, { payload }) => {
+      state.status = 'succeeded';
+      state.user = payload;
+      localStorage.setItem('user', JSON.stringify(payload));
+    });
+    builder.addCase(saveProfile.rejected, (state, action) => {
+      state.status = 'failed';
+      state.error =
+        action.payload || action.error.message || 'Failed to save profile';
+    });
+
+    builder.addCase(changeUserRole.fulfilled, (state) => {
+      state.status = 'succeeded';
+      state.error = null;
+    });
+    builder.addCase(changeUserRole.rejected, (state, action) => {
+      state.status = 'failed';
+      state.error =
+        action.payload || action.error.message || 'Failed to update role';
+    });
   },
 });
 

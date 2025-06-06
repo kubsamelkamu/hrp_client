@@ -9,6 +9,7 @@ import { fetchPropertyById, updateProperty } from '@/store/slices/propertySlice'
 import api from '@/utils/api';
 import UserLayout from '@/components/userLayout/Layout';
 import { ThemeContext } from '@/components/context/ThemeContext';
+import Head from 'next/head';
 
 const EditPropertyPage: NextPage = () => {
   
@@ -97,6 +98,14 @@ const EditPropertyPage: NextPage = () => {
 
   return (
     <UserLayout>
+      <Head>
+          <title> Rentify | Edit properties</title>
+          <meta
+            name="description"
+            content="Edit your property listing details, including title, description, rent, and amenities."
+          />
+          <link rel="canonical" href="/booking" />
+      </Head>
       <div className={`min-h-screen py-12 px-6 ${
         theme === 'dark' 
           ? 'bg-gradient-to-tr from-gray-900 to-gray-800' 

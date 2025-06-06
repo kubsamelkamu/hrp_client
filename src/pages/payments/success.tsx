@@ -5,6 +5,7 @@ import { fetchUserBookings } from '@/store/slices/bookingSlice';
 import toast from 'react-hot-toast';
 import UserLayout from '@/components/userLayout/Layout';
 import { ThemeContext } from '@/components/context/ThemeContext';
+import Head from 'next/head';
 
 const PaymentSuccessPage = () => {
   
@@ -28,6 +29,14 @@ const PaymentSuccessPage = () => {
 
   return (
     <UserLayout>
+        <Head>
+          <title> Rentify | Payment</title>
+          <meta
+            name="description"
+            content="Your payment has been successfully processed. Thank you for choosing Rentify!"
+          />
+          <link rel="canonical" href="/booking" />
+        </Head>
       <div
         className={`min-h-screen p-6 flex flex-col justify-center items-center transition-colors 
           ${theme === 'light' ? 'bg-gray-50 border-gray-200 text-gray-800' : 'bg-gray-900 border-gray-700 text-gray-100'}`}

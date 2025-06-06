@@ -10,6 +10,7 @@ import { requestBooking } from '@/store/slices/bookingSlice';
 import PropertyReviews from '@/components/review/PropertyReviews';
 import UserLayout from '@/components/userLayout/Layout';
 import { ThemeContext } from '@/components/context/ThemeContext';
+import Head from 'next/head';
 
 const PropertyDetailPage: React.FC = () => {
   
@@ -69,6 +70,14 @@ const PropertyDetailPage: React.FC = () => {
 
   return (
     <UserLayout>
+      <Head>
+        <title> Rentify | Properties</title>
+        <meta
+          name="description"
+          content="View property details, images, and request bookings. Connect with landlords or tenants."
+        />
+        <link rel="canonical" href="/booking" />
+      </Head>
       <div
         className={`min-h-screen py-8 px-4 lg:px-0 ${
           theme === 'light'

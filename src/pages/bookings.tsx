@@ -5,18 +5,15 @@ import UserLayout from '@/components/userLayout/Layout';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import toast from 'react-hot-toast';
 import socket from '@/utils/socket';
-import {
-  fetchUserBookings,
-  cancelBooking,
-  updateBookingInStore,
-  Booking,
-} from '@/store/slices/bookingSlice';
+import {fetchUserBookings,cancelBooking,updateBookingInStore,Booking,} from '@/store/slices/bookingSlice';
 import { initiatePayment } from '@/store/slices/paymentSlice';
 import { ThemeContext } from '@/components/context/ThemeContext';
+import Head from 'next/head';
 
 const PAGE_SIZE = 5;
 
 const TenantBookingsPage: NextPage = () => {
+  
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { theme } = useContext(ThemeContext)!;
@@ -140,6 +137,14 @@ const TenantBookingsPage: NextPage = () => {
 
   return (
     <UserLayout>
+      <Head>
+        <title> Rentify | Booking</title>
+        <meta
+          name="description"
+          content="View and manage your bookings on Rentify. Cancel or pay for your bookings easily."
+        />
+        <link rel="canonical" href="/booking" />
+      </Head>
       <div
         className={`min-h-screen p-6 transition-colors ${
           theme === 'dark'
